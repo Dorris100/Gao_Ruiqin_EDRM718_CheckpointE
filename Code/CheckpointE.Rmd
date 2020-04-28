@@ -1,0 +1,108 @@
+---
+title: "CheckpointE"
+author:"Ruiiqn Gao"
+output: html_notebook
+---
+###1
+```{r}
+tidyverse package
+```
+###2
+```{r echo=TRUE}
+library(here)
+library(tidyverse)
+health<-read_csv(here("Data","Small cities Health Data.csv"))
+health
+```
+###3
+```{r echo=TRUE}
+health<-as.data.frame(health)
+str(health)
+health<-as_tibble(health)
+health
+```
+###4
+```{r echo=TRUE}
+health%>%
+ggplot(aes(x=doctors, y=hosp.beds))+
+  geom_point(color= "red", size=3, shape=1)+
+  geom_smooth()+
+  labs(x="Number of physicians", y="Number of beds in hospital")
+```
+###5
+```{r echo=TRUE}
+# Let's filter out the needed data
+health %>%
+  filter(hosp.beds > 1000 ) %>%
+  ggplot(aes(x=doctors, y=hosp.beds))+
+  geom_point(color= "red", size=3, shape=1)+
+  labs(x="Number of physicians", y="Number of beds in hospital")
+```
+###6
+```{r echo=TRUE}
+health %>%
+  filter(hosp.beds > 1000 ) %>%
+  ggplot(aes(x=doctors, y=hosp.beds))+
+  geom_point(color= "red", size=3, shape=1)+
+  geom_smooth(method="lm")+
+  labs(x="Number of physicians", y="Number of beds(>1000) in hospital")
+```
+###7
+```{r echo=TRUE}
+densities<-read_csv(here("Data","Small Cities Densities.csv"))
+densities
+# Check whether city.code is the primary key
+check_city <- densities %>%
+  count(city.code)
+check_city %>%
+  filter(n > 1)
+check_city
+# add variable" density" to the health dataset
+health2<-health %>%
+  left_join(densities, by = "city.code")
+health2
+
+```
+###8
+```{r echo=TRUE}
+health3<-health2%>% 
+  mutate(DensityLevel=cut(density, breaks=c(0,80,120,Inf),
+                      labels=c("Low", "Middle", "High")))
+health3
+```
+###9
+```{r}
+health4<-health3 %>%
+  filter(hosp.beds <1000 ) %>%
+  ggplot(aes(x=doctors, y=hosp.beds, color=DensityLevel))+
+  geom_point(color= "red", size=3, shape=1)+
+  geom_smooth(method="lm",se=FALSE)
+health4
+```
+
+###10
+```{r}
+health4<-health3 %>%
+  filter(hosp.beds <1000 ) %>%
+  ggplot(aes(x=doctors, y=hosp.beds, color=DensityLevel))+
+  geom_point(color= "red", size=3, shape=1)+
+  geom_smooth(method="lm",se=FALSE)+
+  labs(x="Number of doctors",y="Number of hospital beds",
+        title="Numer of doctors and number of hospital beds")
+health4
+```
+###11
+```{r}
+patients<-read_csv(here("Data","Patient Data.csv"))
+patients
+patients1<-patients%>%
+  mutate(patient=substr(patient,9,9))
+patients1
+```
+###12
+```{r}
+Somehow. I think the data is already tidy.
+```
+
+
+
